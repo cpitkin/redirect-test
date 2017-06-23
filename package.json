@@ -1,0 +1,25 @@
+{
+  "name": "redirect-test",
+  "version": "0.0.1",
+  "description": "Test your web server redirects for the correct status code.",
+  "main": "index.js",
+  "repository": "git@github.com:cpitkin/redirect-test.git",
+  "author": "Charlie Pitkin <cpitkin@protonmail.ch>",
+  "license": "MIT",
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1"
+  },
+  "dependencies": {
+    "async": "^2.4.1",
+    "chalk": "^1.1.3",
+    "commander": "^2.9.0",
+    "csv": "^1.1.1",
+    "request": "^2.81.0",
+    "request-rate-limiter": "^1.0.1",
+    "underscore": "^1.8.3",
+    "write-csv": "^1.0.0"
+  }
+}
