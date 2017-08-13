@@ -1,0 +1,14 @@
+language: 'node_js'
+cache: 'yarn'
+before_script:
+  - 'curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter'
+  - 'chmod +x ./cc-test-reporter'
+env:
+  global:
+    -
+      secure: "GSXPf5nCyJUTZIGaNBGKSweKxhRhwZLMkQvK1ZH+0+ZTt1yZjKUmH7EZBH3sIGlETvGhXd8BYbE9pySjGInqyWPlBvBBcl4Z1UFLt01dGuI/fgdCNW+m3mVaAIyP42OJpEMxN/MjaPPS58kAgnMJAK+6Gx7/wLFBRnhv29EBiq7N7okuz8UokLkjocv694lQnvSqgDnbj1EiBMofGUkojFOMtVQPzHPFGARJCwcRKkjy1rEe/p3rjLd24KQqBn6P0x853o6abT2eym/zD9eENpSOcvc5sNEHytrceFBdMKpAZuGpPa1ao3maHi6+Rx6utObSOuEYd8/YXGoxg/cMXyQ054x/9RUJgRcHn2pPErNK4triuKurCMsL89ncqx/OzgyodbRzDXEJP3c1hinYPbgmSiNjXBVSe65+yj1fI+npyXsegkPl3ggOTJIDl8se8R0XavYHZZs1KNUTLyUnMmGyuUZ3Ioq2qJjVj0ehN54K7MFJDjZtVDcawYHjqXdobnlbZhuZOzHj76rzsR5BbNItTOWI+1sJqluumHaZK4EHSZPG13z7HAqoDAwcgxcu16VNMu2LMFGGL02l2/M/32CkVv1M1Gg2z9Q050RHDSf5xjwx8RJBdb3LkALPyYvwlsreuM7oauL7+IcBkuS6krFoJGOCSIjBelxVkeCaltE="
+    - 'GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)'
+script:
+  - 'yarn lint'
+  - 'yarn test'
+  - 'if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi'

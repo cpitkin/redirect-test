@@ -56,3 +56,9 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# direnv environment variables file
+.envrc
+
+# Output files
+results.csv
