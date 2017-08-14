@@ -33,9 +33,7 @@ const q = async.queue((urls, cb) => {
     followRedirect: false,
   }, (err, res) => {
     if (err) {
-      spinner.fail(error('See error below'));
-      console.error(error(err));
-      cb(err, null);
+      spinner.fail(error(err));
     } else {
       if (res.statusCode === 301) {
         const locPath = URL.parse(res.headers.location).pathname;
@@ -125,4 +123,4 @@ if (!isAbsoluteUrl(siteUrl)) {
 
 program.csv = program.csv || './results.csv';
 
-program.csv = path.resolve(program.csv);
+program.csv = path.resolve(program.csv.trim());

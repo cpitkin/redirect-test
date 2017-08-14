@@ -62,3 +62,5 @@ typings/
 
 # Output files
 results.csv
+test.csv
+location.csv

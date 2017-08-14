@@ -23,18 +23,38 @@ test.before('Start Restify server', () => {
     return next();
   });
 
+  server.get('/about-linda', (req, res, next) => {
+    res.header('Location', 'http://localhost:9090/linda');
+    res.send(301);
+    return next();
+  });
+
   server.listen(9090, 'localhost', () => {
     console.log('%s listening at %s', server.name, server.url);
   });
 });
 
-test.after('Clean test files', () => {
-  fs.unlinkSync(path.resolve('results.csv'));
-});
+// test.after('Clean test files', () => {
+//   fs.unlinkSync(path.resolve('results.csv'));
+//   fs.unlinkSync(path.resolve('test.csv'));
+//   fs.unlinkSync(path.resolve('location.csv'));
+// });
 
 test('URL must be an absolute path', (t) => {
   return execa.stderr(index, ['both.csv', 'example.com']).then((result) => {
     t.is(result, 'Error: URL must be an absolute path. eg. https://www.example.com');
+  });
+});
+
+test('Input file doesn\'t exist', (t) => {
+  return execa.stderr(index, ['fileNotThere.csv', localhost]).then((results) => {
+    t.is(results, 'Error: File or directory doesn\'t exist.');
+  });
+});
+
+test('Input file is not in CSV format.', (t) => {
+  return execa.stderr(index, ['bad.json', localhost]).then((results) => {
+    t.is(results, 'Error: It looks like your file is either not a csv or has some bad formatting.');
   });
 });
 
@@ -52,32 +72,71 @@ test('Gives a 404', (t) => {
   });
 });
 
-test('No terminal results', (t) => {
+test('No terminal output', (t) => {
   return execa(index, ['both.csv', localhost, '-q']).then((result) => {
     t.is(result.stderr, '');
     t.regex(result.stdout, /(DONE: Wrote).*(results\.csv)/);
   });
 });
 
-test('Input file doesn\'t exist', (t) => {
-  return execa.stderr(index, ['fileNotThere.csv', localhost]).then((results) => {
-    t.is(results, 'Error: File or directory doesn\'t exist.');
+test('Error on request', (t) => {
+  return execa(index, ['both.csv', 'http://localhost:65000']).then((result) => {
+    t.regex(result.stderr, /(Error: connect ECONNREFUSED 127.0.0.1:65000).*/);
+    t.is(result.stdout, '');
   });
 });
 
-test.serial('Check CSV file', (t) => {
+test.serial('Write to default CSV file', (t) => {
   t.plan(1);
   return execa(index, ['404.csv', localhost]).then((results) => {
     t.is(results.stderr, '✖ See errors in the csv file');
   });
 });
 
-test.serial.cb('Read the results CSV', (t) => {
+test.serial.cb('Read from default results CSV file', (t) => {
   t.plan(1)
   fs.readFile(path.resolve('results.csv'), 'utf8', (error, contents) => {
     csv.parse(contents, (er, data) => {
       csv.stringify(data, (err, stringified) => {
         t.is(stringified, 'old,new,status_code,actual_url\n/about-lousie,/about/lousie,404,\n');
+        t.end(err, stringified);
+      });
+    });
+  });
+});
+
+test.serial('Write to a custom CSV file', (t) => {
+  t.plan(1);
+  return execa(index, ['404.csv', localhost, '-c', 'test.csv']).then((results) => {
+    t.is(results.stderr, '✖ See errors in the csv file');
+  });
+});
+
+test.serial.cb('Read from a custom CSV file', (t) => {
+  t.plan(1)
+  fs.readFile(path.resolve('test.csv'), 'utf8', (error, contents) => {
+    csv.parse(contents, (er, data) => {
+      csv.stringify(data, (err, stringified) => {
+        t.is(stringified, 'old,new,status_code,actual_url\n/about-lousie,/about/lousie,404,\n');
+        t.end(err, stringified);
+      });
+    });
+  });
+});
+
+test.serial('The final URI is incorrect.', (t) => {
+  t.plan(1);
+  return execa(index, ['wrong-location.csv', localhost, '-c', 'location.csv']).then((results) => {
+    t.is(results.stderr, '✖ See errors in the csv file');
+  });
+});
+
+test.serial.cb('Check that the actual URL returned is added to the CSV output if it doesn\'t match', (t) => {
+  t.plan(1)
+  fs.readFile(path.resolve('location.csv'), 'utf8', (error, contents) => {
+    csv.parse(contents, (er, data) => {
+      csv.stringify(data, (err, stringified) => {
+        t.is(stringified, 'old,new,status_code,actual_url\n/about-linda,/about/linda,301,/linda\n');
         t.end(err, stringified);
       });
     });

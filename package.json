@@ -19,6 +19,7 @@
     "babel-eslint": "^7.2.3",
     "eslint": "^4.3.0",
     "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-plugin-ava": "^4.2.1",
     "eslint-plugin-import": "^2.7.0",
     "execa": "^0.7.0",
     "nyc": "^10.0.0",
@@ -41,7 +42,7 @@
       "test/*.csv"
     ],
     "timeout": "10s",
-    "failFast": true,
+    "failFast": false,
     "failWithoutAssertions": true,
     "powerAssert": true
   },
