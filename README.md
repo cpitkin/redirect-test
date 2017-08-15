@@ -47,6 +47,23 @@ redirect-test <file> <url> [options]
 
 ![Screenshot](images/results.csv.png)
 
+#### Tests
+
+yarn
+```sh
+yarn test
+```
+
+If you want to dev locally and run tests on file changes you can run the following.
+
+```sh
+yarn test-local
+```
+
+*NOTE:* I politely ask that all pull requests have proper tests otherwise you will be asked to add them.
+
 #### License
 
-MIT © 2017 Charlie Pitkin
+[MIT © 2017 Charlie Pitkin](LICENSE)
+
+#### [Changelog](CHANGELOG.md)
