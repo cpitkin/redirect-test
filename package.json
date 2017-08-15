@@ -1,6 +1,6 @@
 {
   "name": "redirect-test",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "Test your web server redirects for the correct status code.",
   "main": "index.js",
   "repository": "git@github.com:cpitkin/redirect-test.git",
