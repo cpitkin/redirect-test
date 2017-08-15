@@ -1,6 +1,6 @@
 # Redirect Test Changelog
 
-## Unreleased
+## v1.1.2
 
 - Enhancements
   - \#1: Adds `-a, --auth` option to test domains behind basic authentication.
