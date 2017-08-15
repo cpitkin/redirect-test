@@ -31,9 +31,9 @@ redirect-test <file> <url> [options]
 #### Required fields
 
 `file`: A csv file in the following format:
-`old-URL,new-URL` eg. `/about-bob,/about/bob`
+`old-URI,new-URI` eg. `/about-bob,/about/bob`
 
-`url`: The URL must be the final URL for the site. If it is not the redirect will get caught to early by conditionals such as non-www -> www and http -> https. Since this tool is not meant to test those types of redirects you will want to use the proper FQDN.
+`url`: The URL must be the final URL for the site. If it is not the redirect will get caught to early by conditionals such as non-www -> www and http -> https. Since this tool is not meant to test those types of redirects you will want to use the proper FQDN. eg. https://example.com
 
 #### Options
 

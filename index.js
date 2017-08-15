@@ -16,6 +16,14 @@ const pkgVersion = require('./package.json').version;
 
 let fileName;
 let siteUrl;
+const options = {
+  method: 'get',
+  headers: {
+    'User-Agent': `Redirect Tester v${pkgVersion}`,
+  },
+  followRedirect: false,
+}
+const errorCodes = /4[0-9][0-3|5-9]|5[0-9][0-9]/g;
 const updatedCSV = [];
 const error = chalk.bold.red;
 const good = chalk.bold.green;
@@ -24,16 +32,10 @@ const spinner = ora({ spinner: 'dots2', text: `Making HTTP(S) requests with conc
 
 const q = async.queue((urls, cb) => {
   let update;
-  request({
-    url: siteUrl + urls[0],
-    method: 'get',
-    headers: {
-      'User-Agent': `Redirect Tester v${pkgVersion}`,
-    },
-    followRedirect: false,
-  }, (err, res) => {
+  options.url = siteUrl + urls[0];
+  request(options, (err, res) => {
     if (err) {
-      spinner.fail(error(err));
+      cb(`Error: ${err}`, null);
     } else {
       if (res.statusCode === 301) {
         const locPath = URL.parse(res.headers.location).pathname;
@@ -56,10 +58,19 @@ const q = async.queue((urls, cb) => {
       if (update) {
         updatedCSV.push(update);
       }
-      cb(null, res);
+      if (res.statusCode.toString().match(errorCodes)) {
+        cb(`Error: Server returned a ${res.statusCode} status code.`, null);
+      } else {
+        cb(null, res);
+      }
     }
   });
 }, concurrency);
+
+q.error = (err) => {
+  spinner.fail(error(err));
+  q.kill();
+};
 
 q.drain = () => {
   if (_.isEmpty(updatedCSV) && !program.quite) {
@@ -103,6 +114,7 @@ program
   .option('-c, --csv <file>', 'Save the results to a csv file. Default: ./results.csv')
   .option('-q, --quite', 'Don\'t output error results to the terminal.')
   .option('-n, --number <integer>', 'Number of concurrent requests. Default: 5')
+  .option('-a, --auth <username:password>', 'The username and password for basic auth.')
   .arguments('<file> <url>')
   .action((file, url) => {
     fileName = path.resolve(file.trim());
@@ -124,3 +136,10 @@ if (!isAbsoluteUrl(siteUrl)) {
 program.csv = program.csv || './results.csv';
 
 program.csv = path.resolve(program.csv.trim());
+
+if (program.auth) {
+  const authString = program.auth.split(':');
+  options.auth = {};
+  options.auth.user = authString[0];
+  options.auth.pass = authString[1];
+}

@@ -11,6 +11,8 @@ const localhost = 'http://localhost:9090'
 test.before('Start Restify server', () => {
   const server = restify.createServer();
 
+  server.use(restify.authorizationParser());
+
   server.get('/about-bob', (req, res, next) => {
     res.header('Location', 'http://localhost:9090/about/bob');
     res.send(301);
@@ -29,16 +31,26 @@ test.before('Start Restify server', () => {
     return next();
   });
 
+  server.get('/about-tina', (req, res, next) => {
+    if (req.authorization.basic.username === 'jimmy' && req.authorization.basic.password === 'pesto') {
+      res.header('Location', 'http://localhost:9090/about/tina');
+      res.send(301);
+    } else {
+      res.send(401);
+    }
+    return next();
+  });
+
   server.listen(9090, 'localhost', () => {
     console.log('%s listening at %s', server.name, server.url);
   });
 });
 
-// test.after('Clean test files', () => {
-//   fs.unlinkSync(path.resolve('results.csv'));
-//   fs.unlinkSync(path.resolve('test.csv'));
-//   fs.unlinkSync(path.resolve('location.csv'));
-// });
+test.after('Clean test files', () => {
+  fs.unlinkSync(path.resolve('results.csv'));
+  fs.unlinkSync(path.resolve('test.csv'));
+  fs.unlinkSync(path.resolve('location.csv'));
+});
 
 test('URL must be an absolute path', (t) => {
   return execa.stderr(index, ['both.csv', 'example.com']).then((result) => {
@@ -83,6 +95,19 @@ test('Error on request', (t) => {
   return execa(index, ['both.csv', 'http://localhost:65000']).then((result) => {
     t.regex(result.stderr, /(Error: connect ECONNREFUSED 127.0.0.1:65000).*/);
     t.is(result.stdout, '');
+  });
+});
+
+test('URL is behind basic auth - pass', (t) => {
+  return execa(index, ['basic-auth.csv', localhost, '-a', 'jimmy:pesto']).then((result) => {
+    t.regex(result.stderr, /✔ All links look good\.\n✔ No errors so nothing written to the csv file/);
+    t.is(result.stdout, '');
+  });
+});
+
+test('URL is behind basic auth - fail', (t) => {
+  return execa.stderr(index, ['basic-auth.csv', localhost, '-a', 'wrong:password']).then((result) => {
+    t.is(result, '✖ Error: Server returned a 401 status code.');
   });
 });
 
