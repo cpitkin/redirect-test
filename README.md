@@ -47,7 +47,7 @@ redirect-test <file> <url> [options]
 
 ![Screenshot](images/results.csv.png)
 
-### Tests
+## Tests
 
 yarn
 ```sh
@@ -62,7 +62,7 @@ yarn test-local
 
 *NOTE:* I politely ask that all pull requests have proper tests otherwise you will be asked to add them.
 
-### License
+## License
 
 [MIT © 2017 Charlie Pitkin](LICENSE)
 
