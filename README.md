@@ -39,7 +39,7 @@ redirect-test <file> <url> [options]
 
 `-c, --csv`: This will allow you to output to a custom csv file name and path. Default: ./results.csv
 
-`-q, --quite`: This will limit the console output to only print the csv file path.
+`-q, --quiet`: This will limit the console output to only print the csv file path.
 
 `-n, --number`: The number of concurrent requests to make to the testing URL at a time. Default: 5
 

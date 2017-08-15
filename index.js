@@ -73,13 +73,13 @@ q.error = (err) => {
 };
 
 q.drain = () => {
-  if (_.isEmpty(updatedCSV) && !program.quite) {
+  if (_.isEmpty(updatedCSV) && !program.quiet) {
     spinner.succeed(good('All links look good.'));
     spinner.succeed(good('No errors so nothing written to the csv file'));
-  } else if (!program.quite) {
+  } else if (!program.quiet) {
     spinner.fail(error('See errors in the csv file'));
     writeCSV(program.csv, updatedCSV);
-  } else if (program.quite) {
+  } else if (program.quiet) {
     spinner.stop();
     writeCSV(program.csv, updatedCSV);
   }
@@ -112,7 +112,7 @@ program
   .usage('<file> <url> [options]')
   .description('Check a list of new URLs for 301 status code and path for correctness.')
   .option('-c, --csv <file>', 'Save the results to a csv file. Default: ./results.csv')
-  .option('-q, --quite', 'Don\'t output error results to the terminal.')
+  .option('-q, --quiet', 'Don\'t output error results to the terminal.')
   .option('-n, --number <integer>', 'Number of concurrent requests. Default: 5')
   .option('-a, --auth <username:password>', 'The username and password for basic auth.')
   .arguments('<file> <url>')
